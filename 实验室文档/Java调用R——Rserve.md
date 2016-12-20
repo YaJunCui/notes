@@ -20,7 +20,7 @@ Rserve是一个基于TCP/IP协议的，允许R语言与其他语言进行通信�
 
 * 2.2.1 在R中安装Rserve扩展包。R中安装命令：install.packages("Rserve")
 
-  ![在R中安装Rserve扩展包](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_1.jpg)
+  ![在R中安装Rserve扩展包](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_1.jpg?raw=true)
 
   运行之后，rJava默认被安装到R的安装路径中library文件夹中。例如：D:\Program Files\R\R-3.2.2\library\Rserve。
 
@@ -30,24 +30,24 @@ Rserve是一个基于TCP/IP协议的，允许R语言与其他语言进行通信�
 
 * 3.1 首先启动Rserve。在RGui中分别执行library("Rserve")和Rserve()，即可启动Rserve。
 
-  ![启动Rserve](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_2.jpg)
+  ![启动Rserve](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_2.jpg?raw=true)
 
 * 3.2 在Java Web工程中添加R语句输入和执行页面。
 
   R语句输入页面index.jsp，核心代码：
 
-  ![index.jsp](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_3.jpg)
+  ![index.jsp](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_3.jpg?raw=true)
 
   输入R标准语句，提交后转发到R的执行页面doAction.jsp，核心代码：
 
-  ![doAction.jsp](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_4.jpg)
+  ![doAction.jsp](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_4.jpg?raw=true)
 
   首先添加在R语句执行界面导入REngine和Rserve包，接着获取输入页面输入的R指令，然后通过RConnection()函数连接Rserve服务程序。本示例可以执行任何R语句输出结果是数组的指令，将evel()函数执行的结果转为Java数组进行输出。
 
 * 3.2.3 将工程部署到Tomcat服务器上即可在输入页面进行输入。
 
-  ![输入](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_5.jpg)
-  ![结果](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_6.jpg)
+  ![输入](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_5.jpg?raw=true)
+  ![结果](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_6.jpg?raw=true)
 
 ## 4 存在的问题
 
@@ -57,6 +57,6 @@ Rserve是一个基于TCP/IP协议的，允许R语言与其他语言进行通信�
 
   例如：在RGui中执行c(1:10,"next",2)，结果如下：
 
-  ![RGui](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_7.jpg)
+  ![RGui](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_7.jpg?raw=true)
 
   但是使用JRI不能进行执行，因为REXP的asDoubles()方法不支持字符串。
