@@ -5,4 +5,5 @@
 * 一个名词：**负载系数**，意指元素个数除以表格大小，负载系数大小为0~1（链地址法除外）。
 * 线性探测法：
 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 $$ x^{y^z}=(1+{\rm e}^x)^{-2xy^w} $$
