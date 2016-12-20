@@ -8,8 +8,8 @@
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 $$ x^{y^z}=(1+{\rm e}^x)^{-2xy^w} $$
 
- <script type="text/javascript">window.MathJax = false;</script>
-  <script type="text/x-mathjax-config"> 
+<script type="text/javascript">window.MathJax = false;</script>
+ <script type="text/x-mathjax-config"> 
           MathJax.Hub.Config({ 
           tex2jax: {inlineMath: [["$","$"],["\,"\" />"</span><spanclass="crayon−sy">,</span><spanclass="crayon−s">" "]]}
               });
