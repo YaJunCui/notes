@@ -20,7 +20,7 @@ Rserve是一个基于TCP/IP协议的，允许R语言与其他语言进行通信�
 
 * 2.2.1 在R中安装Rserve扩展包。R中安装命令：install.packages("Rserve")
 
-![在R中安装Rserve扩展包](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_1.jpg)
+  ![在R中安装Rserve扩展包](https://github.com/YaJunCui/notes/blob/master/images/lab_java_R_Rserve_1.jpg)
 
 运行之后，rJava默认被安装到R的安装路径中library文件夹中。例如：D:\Program Files\R\R-3.2.2\library\Rserve。
 2.2.2 新建一个Java web工程，将D:\Program Files\R\R-3.2.2\library\Rserve\java下的REngine.java和Rserve.java导入到/WebContent/WEB-INF/lib目录下，然后就可以进行R语言的调用。
