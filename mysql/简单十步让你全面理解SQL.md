@@ -203,9 +203,19 @@ WHERE EXISTS (SELECT 1 FROM book WHERE book.author_id = author.id)
 ```
 
 尽管没有严格的规定说明你何时应该使用 IN ，何时应该使用 EXISTS ，但是这些事情你还是应该知道的：
-
 > 1 IN 比 EXISTS 的可读性更好  
 > 2 EXISTS 比IN 的表达性更好（更适合复杂的语句）  
 > 3 二者之间性能没有差异（但对于某些数据库来说性能差异会非常大）
 
 因为使用 INNER JOIN 也能得到书名表中书所对应的作者信息，所以很多初学者机会认为可以通过 DISTINCT 进行去重，然后将 SEMI JOIN 语句写成这样：
+
+```sql
+-- Find only those authors who also have books  
+SELECT DISTINCT first_name, last_name  
+FROM author  
+JOIN book ON author.id = book.author_id
+```
+
+这是一种很糟糕的写法，原因如下：
+> SQL 语句性能低下：因为去重操作（ DISTINCT ）需要数据库重复从硬盘中读取数据到内存中。（译者注： DISTINCT 的确是一种很耗费资源的操作，但是每种数据库对于 DISTINCT 的操作方式可能不同）。  
+> 这么写并非完全正确：尽管也许现在这么写不会出现问题，但是随着 SQL 语句变得越来越复杂，你想要去重得到正确的结果就变得十分困难。  
