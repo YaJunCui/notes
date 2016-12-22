@@ -217,5 +217,21 @@ JOIN book ON author.id = book.author_id
 ```
 
 这是一种很糟糕的写法，原因如下：
-> SQL 语句性能低下：因为去重操作（ DISTINCT ）需要数据库重复从硬盘中读取数据到内存中。（译者注： DISTINCT 的确是一种很耗费资源的操作，但是每种数据库对于 DISTINCT 的操作方式可能不同）。  
-> 这么写并非完全正确：尽管也许现在这么写不会出现问题，但是随着 SQL 语句变得越来越复杂，你想要去重得到正确的结果就变得十分困难。  
+> SQL 语句性能低下：因为去重操作（ DISTINCT ）需要数据库重复从硬盘中读取数据到内存中。（译者注： DISTINCT 的确是一种很耗费资源的操作，但是每种数据库对于 DISTINCT 的操作方式可能不同）。
+> 这么写并非完全正确：尽管也许现在这么写不会出现问题，但是随着 SQL 语句变得越来越复杂，你想要去重得到正确的结果就变得十分困难。
+
+### ANTI JOIN
+
+这种连接的关系跟 SEMI JOIN 刚好相反。在 IN 或者 EXISTS 前加一个 NOT 关键字就能使用这种连接。举个例子来说，我们列出书名表里没有书的作者：
+
+```sql
+-- Using IN  
+FROM author  
+WHERE author.id NOT IN (SELECT book.author_id FROM book)  
+
+-- Using EXISTS  
+FROM author  
+WHERE NOT EXISTS (SELECT 1 FROM book WHERE book.author_id = author.id)  
+```
+
+关于性能、可读性、表达性等特性也完全可以参考 SEMI JOIN。
