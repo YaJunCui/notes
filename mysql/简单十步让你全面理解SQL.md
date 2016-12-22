@@ -84,7 +84,6 @@ FROM 输出的结果被 WHERE 语句筛选后要经过 GROUP BY 语句处理，�
 如果我们从集合论（关系代数）的角度来看，一张数据库的表就是一组数据元的关系，而每个 SQL 语句会改变一种或数种关系，从而产生出新的数据元的关系（即产生新的表）。
 
 * **我们学到了什么？**
-
 * 思考问题的时候从表的角度来思考问题提，这样很容易理解数据如何在 SQL 语句的“流水线”上进行了什么样的变动。
 
 ## 4 灵活引用表能使 SQL 语句变得更强大
@@ -104,7 +103,7 @@ FROM 输出的结果被 WHERE 语句筛选后要经过 GROUP BY 语句处理，�
 FROM a, b
 ```
 
-a 可能输如下表的连接：
+a 可能是如下表的连接：
 
 ```sql
 a1 JOIN a2 ON a1.id = a2.id
@@ -116,3 +115,75 @@ a1 JOIN a2 ON a1.id = a2.id
 FROM a1 JOIN a2 ON a1.id = a2.id, b
 ```
 
+尽管将一个连接表用逗号跟另一张表联合在一起并不是常用作法，但是你的确可以这么做。结果就是，最终输出的表就有了 a1+a2+b 个字段了。
+
+* **我们学到了什么？**
+
+* 思考问题时，要从表引用的角度出发，这样就很容易理解数据是怎样被 SQL 语句处理的，并且能够帮助你理解那些复杂的表引用是做什么的。
+
+  更重要的是，要理解 JOIN 是构建连接表的关键词，并不是 SELECT 语句的一部分。有一些数据库允许在 INSERT 、 UPDATE 、 DELETE 中使用 JOIN 。
+
+## 5 SQL 语句中推荐使用表连接
+
+我们先看看刚刚这句话：
+
+```sql
+FROM a,b
+```
+
+高级 SQL 程序员也许学会给你忠告：尽量不要使用逗号来代替 JOIN 进行表的连接，这样会提高你的 SQL 语句的可读性，并且可以避免一些错误。
+
+利用逗号来简化 SQL 语句有时候会造成思维上的混乱，想一下下面的语句：
+
+```sql
+FROM a, b, c, d, e, f, g, h
+WHERE a.a1 = b.bx
+AND a.a2 = c.c1
+AND d.d1 = b.bc
+-- etc...
+```
+
+我们不难看出使用 JOIN 语句的好处在于：
+
+* 安全。 JOIN 和要连接的表离得非常近，这样就能避免错误。
+* 更多连接的方式，JOIN 语句能去区分出来外连接和内连接等。
+
+
+* **我们学到了什么？**
+* 记着要尽量使用 JOIN 进行表的连接，永远不要在 FROM 后面使用逗号连接表。
+
+## 6 SQL 语句中不同的连接操作
+
+SQL 语句中，表连接的方式从根本上分为五种：
+
+```sql
+EQUI JOIN
+SEMI JOIN
+ANTI JOIN
+CROSS JOIN
+DIVISION
+```
+
+### EQUI JOIN
+
+这是一种最普通的 JOIN 操作，即等号连接，它包含两种连接方式：
+
+```sql
+INNER JOIN（或者是 JOIN ）   //只输出满足条件的的数据
+OUTER JOIN（包括： LEFT 、 RIGHT、 FULL OUTER JOIN）
+```
+
+用例子最容易说明其中区别：
+
+```sql
+-- This table reference contains authors and their books.
+-- There is one record for each book and its author.
+-- authors without books are NOT included
+author JOIN book ON author.id = book.author_id
+
+-- This table reference contains authors and their books
+-- There is one record for each book and its author.
+-- ... OR there is an "empty" record for authors without books
+-- ("empty" meaning that all book columns are NULL)
+author LEFT OUTER JOIN book ON author.id = book.author_id
+```
