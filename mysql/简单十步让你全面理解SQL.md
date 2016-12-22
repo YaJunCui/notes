@@ -187,3 +187,25 @@ author JOIN book ON author.id = book.author_id
 -- ("empty" meaning that all book columns are NULL)
 author LEFT OUTER JOIN book ON author.id = book.author_id
 ```
+
+### SEMI JOIN
+
+这种连接关系在 SQL 中有两种表现方式：使用 IN，或者使用 EXISTS。“ SEMI ”在拉丁文中是“半”的意思。这种连接方式是只连接目标表的一部分。这是什么意思呢？再想一下上面关于作者和书名的连接。我们想象一下这样的情况：我们不需要作者 / 书名这样的组合，只是需要那些在书名表中的书的作者信息。那我们就能这么写：
+
+```sql
+-- Using IN
+FROM author
+WHERE author.id IN (SELECT book.author_id FROM book)
+
+-- Using EXISTS
+FROM author
+WHERE EXISTS (SELECT 1 FROM book WHERE book.author_id = author.id)
+```
+
+尽管没有严格的规定说明你何时应该使用 IN ，何时应该使用 EXISTS ，但是这些事情你还是应该知道的：
+
+> 1 IN 比 EXISTS 的可读性更好  
+> 2 EXISTS 比IN 的表达性更好（更适合复杂的语句）  
+> 3 二者之间性能没有差异（但对于某些数据库来说性能差异会非常大）
+
+因为使用 INNER JOIN 也能得到书名表中书所对应的作者信息，所以很多初学者机会认为可以通过 DISTINCT 进行去重，然后将 SEMI JOIN 语句写成这样：
