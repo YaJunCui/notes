@@ -270,3 +270,146 @@ DIVISION 的确是一个怪胎。简而言之，如果 JOIN 是一个乘法运�
 
 学到了很多！让我们在脑海中再回想一下。 SQL 是对表的引用， JOIN 则是一种引用表的复杂方式。但是 SQL 语言的表达方式和实际我们所需要的逻辑关系之间是有区别的，并非所有的逻辑关系都能找到对应的 JOIN 操作，所以这就要我们在平时多积累和学习关系逻辑，这样你就能在以后编写 SQL 语句中选择适当的 JOIN 操作了。
 
+## 7 SQL 中如同变量的派生表
+
+在这之前，我们学习到过 SQL 是一种声明性的语言，并且 SQL 语句中不能包含变量。但是你能写出类似于变量的语句，这些就叫做派生表。
+
+说白了，所谓的派生表就是在括号之中的子查询：
+
+```sql
+-- A derived table  
+FROM (SELECT * FROM author)  
+```
+
+需要注意的是有些时候我们可以给派生表定义一个相关名（即我们所说的别名）。
+
+```sql
+-- A derived table with an alias  
+FROM (SELECT * FROM author) a  
+```
+
+派生表可以有效的避免由于 SQL 逻辑而产生的问题。举例来说：如果你想重用一个用 SELECT 和 WHERE 语句查询出的结果，这样写就可以（以 Oracle 为例）：
+
+```sql
+-- Get authors' first and last names, and their age in days  
+SELECT first_name, last_name, age  
+FROM (  
+  SELECT first_name, last_name, current_date - date_of_birth age  
+  FROM author  
+)  
+-- If the age is greater than 10000 days  
+WHERE age > 10000
+```
+
+需要我们注意的是：在有些数据库，以及 SQL ： 1990 标准中，派生表被归为下一级——通用表语句（ common table experssion）。这就允许你在一个 SELECT 语句中对派生表多次重用。上面的例子就（几乎）等价于下面的语句：
+
+```sql
+WITH a AS (  
+  SELECT first_name, last_name, current_date - date_of_birth age  
+  FROM author  
+)  
+SELECT *  
+FROM a  
+WHERE age > 10000
+```
+
+当然了，你也可以给“ a ”创建一个单独的视图，这样你就可以在更广泛的范围内重用这个派生表了。
+
+**我们学到了什么？**
+
+我们反复强调，大体上来说 SQL 语句就是对表的引用，而并非对字段的引用。要好好利用这一点，不要害怕使用派生表或者其他更复杂的语句。
+
+## 8 SQL 语句中 GROUP BY 是对表的引用进行的操作
+
+让我们再回想一下之前的 FROM 语句：
+
+```sql
+FROM a, b  
+```
+
+现在，我们将 GROUP BY 应用到上面的语句中：
+
+```sql
+GROUP BY A.x, A.y, B.z  
+```
+
+上面语句的结果就是产生出了一个包含三个字段的新的表的引用。我们来仔细理解一下这句话：当你应用 GROUP BY 的时候， SELECT 后没有使用聚合函数的列，都要出现在 GROUP BY 后面。（译者注：原文大意为“当你是用 GROUP BY 的时候，你能够对其进行下一级逻辑操作的列会减少，包括在 SELECT 中的列”）。
+
+```sql
+需要注意的是：其他字段能够使用聚合函数：  
+SELECT A.x, A.y, SUM(A.z)  
+FROM A  
+GROUP BY A.x, A.y  
+还有一点值得留意的是： MySQL 并不坚持这个标准，这的确是令人很困惑的地方。（译者注：这并不是说 MySQL 没有 GROUP BY 的功能）但是不要被 MySQL 所迷惑。 GROUP BY 改变了对表引用的方式。你可以像这样既在 SELECT 中引用某一字段，也在 GROUP BY 中对其进行分组  
+```
+
+**我们学到了什么？**
+
+GROUP BY，再次强调一次，是在表的引用上进行了操作，将其转换为一种新的引用方式。
+
+## 9 SQL 语句中的 SELECT 实质上是对关系的映射
+
+我个人比较喜欢“映射”这个词，尤其是把它用在关系代数上。（译者注：原文用词为 projection ，该词有两层含义，第一种含义是预测、规划、设计，第二种意思是投射、映射，经过反复推敲，我觉得这里用映射能够更直观的表达出 SELECT 的作用）。一旦你建立起来了表的引用，经过修改、变形，你能够一步一步的将其映射到另一个模型中。 SELECT 语句就像一个“投影仪”，我们可以将其理解成一个将源表中的数据按照一定的逻辑转换成目标表数据的函数。
+
+通过 SELECT 语句，你能对每一个字段进行操作，通过复杂的表达式生成所需要的数据。
+
+SELECT 语句有很多特殊的规则，至少你应该熟悉以下几条：
+
+* 你仅能够使用那些能通过表引用而得来的字段；
+* 如果你有 GROUP BY 语句，你只能够使用 GROUP BY 语句后面的字段或者聚合函数；
+* 当你的语句中没有 GROUP BY 的时候，可以使用开窗函数代替聚合函数；
+* 当你的语句中没有 GROUP BY 的时候，你不能同时使用聚合函数和其它函数；
+* 有一些方法可以将普通函数封装在聚合函数中；
+
+一些更复杂的规则多到足够写出另一篇文章了。比如：为何你不能在一个没有 GROUP BY 的 SELECT 语句中同时使用普通函数和聚合函数？（上面的第 4 条）
+
+原因如下：
+
+* 凭直觉，这种做法从逻辑上就讲不通。
+* 如果直觉不能够说服你，那么语法肯定能。 SQL: 1999 标准引入了 GROUPING SETS，SQL：2003 标准引入了 group sets : GROUP BY() 。无论什么时候，只要你的语句中出现了聚合函数，而且并没有明确的 GROUP BY 语句，这时一个不明确的、空的 GROUPING SET 就会被应用到这段 SQL 中。因此，原始的逻辑顺序的规则就被打破了，映射（即 SELECT ）关系首先会影响到逻辑关系，其次就是语法关系。（译者注：这段话原文就比较艰涩，可以简单理解如下：在既有聚合函数又有普通函数的 SQL 语句中，如果没有 GROUP BY 进行分组，SQL 语句默认视整张表为一个分组，当聚合函数对某一字段进行聚合统计的时候，引用的表中的每一条 record 就失去了意义，全部的数据都聚合为一个统计值，你此时对每一条 record 使用其它函数是没有意义的）。
+
+糊涂了？是的，我也是。我们再回过头来看点浅显的东西吧。
+
+**我们学到了什么？**
+
+SELECT 语句可能是 SQL 语句中最难的部分了，尽管他看上去很简单。其他语句的作用其实就是对表的不同形式的引用。而 SELECT 语句则把这些引用整合在了一起，通过逻辑规则将源表映射到目标表，而且这个过程是可逆的，我们可以清楚的知道目标表的数据是怎么来的。
+
+想要学习好 SQL 语言，就要在使用 SELECT 语句之前弄懂其他的语句，虽然 SELECT 是语法结构中的第一个关键词，但它应该是我们最后一个掌握的。
+
+## 10 SQL 语句中的几个简单的关键词： DISTINCT ， UNION ， ORDER BY 和 OFFSET
+
+在学习完复杂的 SELECT 豫剧之后，我们再来看点简单的东西：
+
+```sql
+集合运算（ DISTINCT 和 UNION ）  
+排序运算（ ORDER BY，OFFSET…FETCH）
+```
+
+### 集合运算（ set operation）：
+
+集合运算主要操作在于集合上，事实上指的就是对表的一种操作。从概念上来说，他们很好理解：
+
+```sql
+DISTINCT  在映射之后对数据进行去重  
+UNION     将两个子查询拼接起来并去重  
+UNION ALL 将两个子查询拼接起来但不去重  
+EXCEPT    将第二个字查询中的结果从第一个子查询中去掉  
+INTERSECT 保留两个子查询中都有的结果并去重  
+```
+
+### 排序运算（ ordering operation）：
+
+排序运算跟逻辑关系无关。这是一个 SQL 特有的功能。排序运算不仅在 SQL 语句的最后，而且在 SQL 语句运行的过程中也是最后执行的。使用 ORDER BY 和 OFFSET…FETCH 是保证数据能够按照顺序排列的最有效的方式。其他所有的排序方式都有一定随机性，尽管它们得到的排序结果是可重现的。
+
+OFFSET…SET 是一个没有统一确定语法的语句，不同的数据库有不同的表达方式，如 MySQL 和 PostgreSQL 的 LIMIT…OFFSET、SQL Server 和 Sybase 的 TOP…START AT 等。具体关于 OFFSET..FETCH 的不同语法可以参考这篇文章
+
+<http://www.jooq.org/doc/3.1/manual/sql-building/sql-statements/select-statement/limit-clause/>
+
+**让我们在工作中尽情的使用 SQL！**
+
+正如其他语言一样，想要学好 SQL 语言就要大量的练习。上面的 10 个简单的步骤能够帮助你对你每天所写的 SQL 语句有更好的理解。另一方面来讲，从平时常见的错误中也能积累到很多经验。下面的两篇文章就是介绍一些 JAVA 和其他开发者所犯的一些常见的 SQL 错误：
+
+* [10 Common Mistakes Java Developers Make when Writing SQL](https://blog.jooq.org/2013/07/30/10-common-mistakes-java-developers-make-when-writing-sql/)
+* [10 More Common Mistakes Java Developers Make when Writing SQL](https://blog.jooq.org/2013/08/12/10-more-common-mistakes-java-developers-make-when-writing-sql/)
+
+Ref：<http://blog.jobbole.com/55086/>
