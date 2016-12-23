@@ -1,5 +1,7 @@
 # 简单十步让你全面理解SQL
 
+Ref：<http://blog.jobbole.com/55086/>
+
 ## 1 SQL 是声明性语言
 
 首先需要思考的是，声明性。SQL 语言是为计算机声明了一个你想从原始数据中获得什么样的结果的一个范例，而不是告诉计算机如何能够得到结果。
@@ -411,5 +413,3 @@ OFFSET…SET 是一个没有统一确定语法的语句，不同的数据库有�
 
 * [10 Common Mistakes Java Developers Make when Writing SQL](https://blog.jooq.org/2013/07/30/10-common-mistakes-java-developers-make-when-writing-sql/)
 * [10 More Common Mistakes Java Developers Make when Writing SQL](https://blog.jooq.org/2013/08/12/10-more-common-mistakes-java-developers-make-when-writing-sql/)
-
-Ref：<http://blog.jobbole.com/55086/>
