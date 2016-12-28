@@ -22,4 +22,8 @@
 _CrtDumpMemoryLeaks();
 ```
 
-你可以将其添加到主函数的 `return 0;` 语句上方。这样当你的程序运行完之后，所有 `new` 了之后没有 `delete` 的，或者 `malloc` 了之后没有 `free` 的，都会在 `Output` 窗口里面打印出每一个泄露的对象的长度、前几个字节的值、以及他们是在哪一行代码申请的内存，双击可跳。
+你可以将其添加到主函数的 `return 0;` 语句上方。这样当你的程序运行完之后，所有 `new` 了之后没有 `delete` 的，或者 `malloc` 了之后没有 `free` 的，都会在 `Output` 窗口里面打印出每一个泄露的对象的长度、前几个字节的值、以及他们是在哪一行代码申请的内存，双击可跳。（如图所示）
+
+![控制台输出的内存泄漏信息](https://github.com/YaJunCui/notes/blob/master/images/NEW_WITH_MEMORY_LEAK_CHECKING.png?raw=true)
+
+如果使用的是 `clang++` 的话，那大家可以使用搜索引擎去找一些工具来使用—— `Linux` 用户可以自行搜索关于 `valgrind` 的更多信息。
