@@ -141,7 +141,7 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
     * 服务器端检测在收到 LIST 命令之前是否接收过 PORT 或 PASV 命令。
     * 如果没有接受过，则响应 425 Use Port or PASV first。
     * 如果接收过，并且是 PORT，则服务器端创建数据套接字（bind 20 端口），调用 connect 主动连接客户端 IP 与端口，从而建立了数据连接。
-4. 服务端发送 150 应答个客户端，表示准备就绪，可以开始传输了。
+4. 服务端发送 150 应答客户端，表示准备就绪，可以开始传输了。
 5. 开始传输列表
 6. 服务器发送 226 应答给客户端，表示数据传输结束。
     * 传输结束，服务器主动关闭数据套接字。
@@ -151,3 +151,26 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
 ![FTP被动连接工作模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_pasv_mode.png?raw=true)
 
 ![FTP被动模式工作过程](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_pasv_mode1.png?raw=true)
+
+1. 客户端向服务器发送 PASV 命令
+2. 服务器以 227 响应
+    * 服务器创建数据套接字；
+    * 服务器绑定一个临时端口；
+    * 服务器在套接字上监听；
+    * 将 IP 与端口格式化为 h1,h2,h3,h4,p1,p2响应给客户端，以便客户端发起数据连接。
+3. 客户端向服务端发送 LIST
+    * 服务器端检测在收到 LIST 命令之前是否接收过 PORT 或 PASV 命令。
+    * 如果没有接受过，则响应 425 Use Port or PASV first。
+    * 如果接收过，并且是 PASV，则调用 accept 被动接受客户端的连接，返回已连接套接字，从而建立了数据连接。
+4. 服务端发送 150 应答客户端，表示准备就绪，可以开始传输了。
+5. 开始传输列表
+6. 服务器发送 226 应答给客户端，表示数据传输结束。
+    * 传输结束，服务器主动关闭数据套接字。
+
+### 1.8.3 NAT 或防火墙对主被动模式的影响
+
+#### 1.8.3.1 什么是 NAT
+
+NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 IP 地址转换为公网 IP 地址。在一定程度上解决了公网地址不足的问题。
+
+![NET](https://github.com/YaJunCui/notes/blob/master/images/ftp_net.png?raw=true)
