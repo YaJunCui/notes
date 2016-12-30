@@ -174,3 +174,7 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
 NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 IP 地址转换为公网 IP 地址。在一定程度上解决了公网地址不足的问题。
 
 ![NET](https://github.com/YaJunCui/notes/blob/master/images/ftp_net.png?raw=true)
+
+#### 1.8.3.2 FTP 客户端处于 NAT 或者防火墙之后的主动模式
+
+![FTP在NET的主动之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_port_mode.png?raw=true)
