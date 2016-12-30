@@ -125,3 +125,7 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
 ## 1.8 FTP两种工作模式
 
 ### 1.8.1 主动模式
+
+![FTP主动连接工作模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_mode.png?raw=true)
+
+![FTP主动模式工作过程](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_mode1.png?raw=true)
