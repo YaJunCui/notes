@@ -171,7 +171,7 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
 
 #### 1.8.3.1 什么是 NAT
 
-NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 IP 地址转换为公网 IP 地址。在一定程度上解决了公网地址不足的问题。
+NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 IP 地址转换为公网 IP 地址。在一定程度上解决了公网 IP 地址不足的问题。
 
 ![NET](https://github.com/YaJunCui/notes/blob/master/images/ftp_net.png?raw=true)
 
