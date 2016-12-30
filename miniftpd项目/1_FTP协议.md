@@ -193,3 +193,7 @@ NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 I
 #### 1.8.3.4 服务器处于 NAT 或者防火墙之后的被动模式
 
 ![服务器在NET之后的被动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_pasv_mode1.png?raw=true)
+
+#### 1.8.3.5 服务器处于 NAT 或者防火墙之后的主动模式
+
+![服务器在NET之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_port_mode1.png?raw=true)
