@@ -126,9 +126,9 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
 
 ### 1.8.1 主动模式
 
-![FTP主动连接工作模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_mode.png?raw=true)
+![FTP主动连接工作模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_port_mode.png?raw=true)
 
-![FTP主动模式工作过程](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_mode1.png?raw=true)
+![FTP主动模式工作过程](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_port_mode1.png?raw=true)
 
 1. 客户端向服务器发送 PORT 命令
     * 客户端创建数据套接字；
@@ -147,3 +147,7 @@ FTP 工作在TCP/IP 协议族的**应用层**，其传输层使用的是 TCP 协
     * 传输结束，服务器主动关闭数据套接字。
 
 ### 1.8.2 FTP 被动模式
+
+![FTP被动连接工作模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_pasv_mode.png?raw=true)
+
+![FTP被动模式工作过程](https://github.com/YaJunCui/notes/blob/master/images/ftp_work_pasv_mode1.png?raw=true)
