@@ -178,3 +178,14 @@ NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 I
 #### 1.8.3.2 FTP 客户端处于 NAT 或者防火墙之后的主动模式
 
 ![FTP在NET的主动之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_port_mode.png?raw=true)
+
+1. 建立控制连接通道
+    * 因为 NAT 会主动记录由内部发送外部的连接信息，而控制连接通道的建立是由客户端向服务端连接的，因此这一条连接可以顺利地建立起来。
+2. 客户端与服务端数据连接建立时的通知
+    * 客户端先启动 PORT BB 端口，并通过命令通道告知 FTP 服务器，且等待服务器的主动连接。
+3. 服务器主动连接客户端
+    * 由于通过 NAT 转换后，服务器只能得知 NAT 的地址并不知道客户端的 IP 地址，因此服务器会以 20 端口主动向 NAT 的 PORT BB 端口发送主动连接请求，但 NAT 并没有启用 PORT BB 端口，因此连接被拒绝。
+
+#### 1.8.3.3 FTP 客户端处于 NAT 或者防火墙之后的被动模式
+
+![FTP在NET的被动之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_pasv_mode.png?raw=true)
