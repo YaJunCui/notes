@@ -177,7 +177,7 @@ NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 I
 
 #### 1.8.3.2 FTP 客户端处于 NAT 或者防火墙之后的主动模式
 
-![FTP在NET的主动之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_port_mode.png?raw=true)
+![FTP在NET之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_port_mode.png?raw=true)
 
 1. 建立控制连接通道
     * 因为 NAT 会主动记录由内部发送外部的连接信息，而控制连接通道的建立是由客户端向服务端连接的，因此这一条连接可以顺利地建立起来。
@@ -188,4 +188,8 @@ NAT的全称是 Network Address Translation，通过 NAT 可以将内网私有 I
 
 #### 1.8.3.3 FTP 客户端处于 NAT 或者防火墙之后的被动模式
 
-![FTP在NET的被动之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_pasv_mode.png?raw=true)
+![FTP在NET之后的主动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_pasv_mode.png?raw=true)
+
+#### 1.8.3.4 服务器处于 NAT 或者防火墙之后的被动模式
+
+![服务器在NET之后的被动模式](https://github.com/YaJunCui/notes/blob/master/images/ftp_net_pasv_mode1.png?raw=true)
