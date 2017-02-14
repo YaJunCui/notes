@@ -380,7 +380,7 @@ SELECT 语句可能是 SQL 语句中最难的部分了，尽管他看上去很�
 
 ## 10 SQL 语句中的几个简单的关键词： DISTINCT ， UNION ， ORDER BY 和 OFFSET
 
-在学习完复杂的 SELECT 豫剧之后，我们再来看点简单的东西：
+在学习完复杂的 SELECT 语句之后，我们再来看点简单的东西：
 
 ```sql
 集合运算（ DISTINCT 和 UNION ）  
