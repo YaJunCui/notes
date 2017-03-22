@@ -6,6 +6,7 @@
 #include <cstdlib>
 
 #include <initializer_list>
+#include <vector>
 
 #ifndef _MSC_VER
 #include <cxxabi.h>
