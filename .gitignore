@@ -1,6 +1,12 @@
-# 忽略可执行文件
-*.exe
-*.out
+# 忽略的文件夹
+ipch/
+.vscode/
+Debug/
+Release/
 
-# 忽略文件夹
-*.vscode/
+# 忽略的文件
+*.sdf
+*.exe
+*.suo
+*.o
+*.out
