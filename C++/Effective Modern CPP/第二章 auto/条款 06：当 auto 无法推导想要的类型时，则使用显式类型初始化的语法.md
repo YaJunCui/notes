@@ -12,7 +12,7 @@ std::vector<bool> features(const Widget& w);
 Widget w;
 
 bool highPriority = features(w)[5];
-processWidget(w, highPriority);          //根据w的优先级处理w
+processWidget(w, highPriority);               //根据w的优先级处理w
 ```
 
 这段代码没有错。它工作得很好。但是如果我们做一些看起来无害的操作，也就是用 auto 来替换 highPriority 的显式类型声明，
@@ -24,7 +24,7 @@ auto highPriority = features(w)[5];
 情况改变了。所有的代码将能继续通过编译，但是它的行为不再和预测的一样了：
 
 ```C++
-processWidget(w, highPriority);         //未定义的行为！
+processWidget(w, highPriority);               //未定义的行为！
 ```
 
 就像注释指示的那样，调用 processWidget 现在是未定义的行为。但是为什么会这样？回答有可能很奇怪。在使用 auto 的代码中，highPriority 的类型不再是 bool，尽管 std::vector\<bool\> 概念上保存了bools，std::vector\<bool\> 的 operator[] 不返回容器元素的引用（除了 bool 类型，其他的 std::vector::operator[] 都这么返回）。作为替换，它返回一个类型是 std::vector\<bool\>::reference 的对象（一个类内部装了std::vector\<bool\>）。
@@ -42,7 +42,7 @@ bool highPriority = features(w)[5];           //显式声明highPriority的类�
 对比对 highPriority 使用 auto 初始化声明时发生的情况：
 
 ```C++
-auto highPriority = features(w)[5];          //推导highPriority的类型
+auto highPriority = features(w)[5];           //推导highPriority的类型
 ```
 
 再一次，features 返回一个 std::vector\<bool\> 对象，并且，再一次，operator[] 被调用。operator[] 继续返回一个 std::vector\<bool\>::reference 对象，但是现在这里有些变化，因为 auto 推导 highPriority 的类型为 std::vector\<bool\>::reference。highPriority 不再拥有 features 返回的 std::vector\<bool\> 中的第 5 位的值。
@@ -52,7 +52,7 @@ auto highPriority = features(w)[5];          //推导highPriority的类型
 对于 features 的调用返回一个 std::vector\<bool\> 临时对象。这个对象没有名字，但是为了讨论的目的，我讲把它叫做 temp。operator[] 是对 temp 的调用，并且 std::vector\<bool\>::reference 返回一个对象，这个对象指向一个字节（word），这个被 temp 管理的数据结构中的字节持有所需的位，加上对象存储的偏移就能找到第 5 位。highPriority 是这个 std::vector\<bool\>::reference 对象的一份拷贝。所以 highPriority 也持有指向 temp 中某个字节（word）的指针，以及第 5 位的偏移。在语句的最后，temp 销毁了，因为它是一个临时对象。因此，highPriority 持有的是一个悬挂的指针，并且这就是在 processWidget 调用中造成未定义行为的原因：
 
 ```C++
-processWidget(w, highPriority); //未定义行为！highPriority持有悬挂的指针
+processWidget(w, highPriority);               //未定义行为！highPriority持有悬挂的指针
 ```
 
 std::vector\<bool\>::reference 是一个代理类的例子：一个类的存在是为了效仿和增加其他类型的行为。代理类被用作各种各样的目的。std::vector\<bool\>::reference 为了提供一个错觉：std::vector\<bool\> 的 operator[] 返回一个 bool 引用。再举个例子，标准库的智能指针是一个对原始指针进行资源管理的代理类。代理类的用法已经慢慢固定下来了。事实上，设计模式“Proxy”就是软件设计模式万神殿（Pantheon）中长期存在的一员。
