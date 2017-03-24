@@ -135,12 +135,14 @@ auto ep = static_cast<float>(calcEpsilon());
 
 ```C++
 int index = d * c.size();
+if (idx == c.size()) --idx;            //当d为1.0时，idx保持有效
 ```
 
 但是这模糊了一个事实，就是你故意地把右边的 double 转换成了一个 int。显式类型初始化语法让事情变得易懂了：
 
 ```C++
 auto index = static_cast<int>(d * c.size());
+if (idx == c.size()) --idx;            //当d为1.0时，idx保持有效
 ```
 
 ## 请记住
