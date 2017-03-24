@@ -122,7 +122,7 @@ for(const std::pair<std::string, int>& p : m)
 
 这看起来很有道理，但是这里存在一个问题，你看到了吗？
 
-想想看什么需要记住的东西遗漏了，std::unordered\_map 的键的部分是 const 的，所以在 hash table（std::unordered\_map的存储类型）中的 std::pair 的类型不是 std::pair<std::string, int>，它是std::pair<const std::string, int>。但是这不是上面循环中的变量p的声明类型。对于这个结果，编译器将努力去找到一个方法来转换 std::pair<const std::string, int> 对象（也就是hash table的内容）到 std::pair<std::string, int> 对象（p 声明的类型）。通过拷贝 m 里的对象，创造一个个临时对象，然后把 p 引用绑定到临时对象上去，p 就成功地被创造出来了。在每一次循环结尾，临时对象将被销毁。如果你写下这样的循环，你会被它的效率所震惊，因为大概你想做的只是简单地把 p 的引用绑定到 m 的每个元素p上。
+想想看什么需要记住的东西遗漏了，std::unordered\_map 的键的部分是 const 的，所以在 hash table（std::unordered\_map的存储类型）中的 std::pair 的类型不是 std::pair<std::string, int>，它是std::pair\<const std::string, int\>。但是这不是上面循环中的变量p的声明类型。对于这个结果，编译器将努力去找到一个方法来转换 std::pair\<const std::string, int\> 对象（也就是hash table的内容）到 std::pair\<std::string, int\> 对象（p 声明的类型）。通过拷贝 m 里的对象，创造一个个临时对象，然后把 p 引用绑定到临时对象上去，p 就成功地被创造出来了。在每一次循环结尾，临时对象将被销毁。如果你写下这样的循环，你会被它的效率所震惊，因为大概你想做的只是简单地把 p 的引用绑定到 m 的每个元素p上。
 
 这样无意识的类型不匹配能通过auto来消除：
 
@@ -135,7 +135,7 @@ for(const auto& p : m)
 
 这不仅更加有效率，也更容易写。更好的是，这个代码有一个非常吸引人的特征，那就是如果你获取 p 的地址，你肯定能取到一个指向存在于 m 中的 p 的指针，但是如果不使用 auto，你会取到一个指向临时变量的指针，而且这个临时变量在每一次循环结尾会销毁。
 
-最后的两个例子---当你应该写 std::vector::size_type 时却写了 unsigned 和当你应该写 std::pair<const std::string, int> 时却写了 std::pair<std::string, int> ---演示了写下明确的类型如何导致隐式的转换，并且这种转换是你不想要的。如果你使用 auto 来作为目标变量的类型，你不需要考虑声明的变量和用来初始化的表达式之间的类型不匹配。
+最后的两个例子---当你应该写 std::vector\<int\>::size_type 时却写了 unsigned 和当你应该写 std::pair<const std::string, int> 时却写了 std::pair\<std::string, int\> ---演示了写下明确的类型如何导致隐式的转换，并且这种转换是你不想要的。如果你使用 auto 来作为目标变量的类型，你不需要考虑声明的变量和用来初始化的表达式之间的类型不匹配。
 
 因此，这里有很多原因来让你选择 auto 而不是显式的类型声明。到目前为止，auto 不是完美的。对于每个 auto 变量，类型是从它的初始化表达式推导来的，并且一些初始化表达式拥有的类型不是我们能预料到以及想要的。会出现这样情况的情景，以及你要如何做已经在 条款02 和 条款06 中讨论了，所以我在这不会涉及他们了。作为替换，我将把我的注意力放在在你使用传统的类型声明时，你使用 auto 会有什么不同之处：生成的源代码的可读性。
 
