@@ -115,9 +115,9 @@ auto result2 = lockAndCall(f2, f2m, NULL);      //错误
 auto result3 = lockAndCall(f3, f3m, nullptr);   //正确
 ```
 
-很好，它们能这么写，但是，正如注释说的，前面两种情况，代码无法通过编译。第一种调用情况的问题是当 0 被传入 lockAndCall时，template 类型推导会找出它的类型。0 的类型过去是，现在是，未来也永远是 int，所以这就是在实例化的 lockAndCall 中，ptr 参数的类型。不幸地，这意味着在 lockAndCall 中，调用 func 时，会传入一个 int 类型，然而它和 f1 需要的std::shared\_ptr 参数不兼容。在 lockAndCall 调用中，尝试用传入 0 来代替一个 null 指针，但是实际上传入的是普通的 int。尝试传入一个 int 作为 std::shared\_ptr 给 f1 将产生类型错误。对于用 0 调用 lockAndCall 会失败，是因为在 template 中，一个 int 被传入一个需要 std::shared\_ptr 的函数。（译注：理解起来很简单，这里没有 int 到 指针类型的转换，只有 0 视为指针这一情况。所以调用会失败。）
+很好，它们能这么写，但是，正如注释说的，前面两种情况，代码无法通过编译。第一种调用情况的问题是当 0 被传入 lockAndCall时，template 类型推导会找出它的类型。0 的类型过去是，现在是，未来也永远是 int，所以这就是在实例化的 lockAndCall 中，ptr 参数的类型。不幸地，这意味着在 lockAndCall 中，调用 func 时，会传入一个 int 类型，然而它和 f1 需要的std::shared\_ptr\<Widget\> 参数不兼容。在 lockAndCall 调用中，尝试用传入 0 来代替一个 null 指针，但是实际上传入的是普通的 int。尝试传入一个 int 作为 std::shared\_ptr\<Widget\> 给 f1 将产生类型错误。对于用 0 调用 lockAndCall 会失败，是因为在 template 中，一个 int 被传入一个需要 std::shared\_ptr\<Widget\> 的函数。（译注：理解起来很简单，这里没有 int 到 指针类型的转换，只有 0 视为指针这一情况。所以调用会失败。）
 
-对于调用涉及 NULL 的分析在本质上和 0 是一样的。当 NULL 被传入 lockAndCall 时，一个整形类型被推导为 ptr 参数的类型，并且当一个 int 或一个类似 int 类型的参数被传入 f2（需要一个 std::unique\_ptr 类型的参数）时，类型错误就发生了。
+对于调用涉及 NULL 的分析在本质上和 0 是一样的。当 NULL 被传入 lockAndCall 时，一个整形类型被推导为 ptr 参数的类型，并且当一个 int 或一个类似 int 类型的参数被传入 f2（需要一个 std::unique\_ptr\<Widget\> 类型的参数）时，类型错误就发生了。
 
 作为对比，当调用涉及 nullptr 时没有问题。当 nullptr 被传入 lockAndCall 时，ptr 的类型被推导为 std::nullptr\_t。当 ptr 被传入 f3 时，这里发生了一个从 std::nullptr\_t 到 Widget* 的隐式转换，因为 std::nullptr\_t 能隐式转换到任何类型的指针。
 
