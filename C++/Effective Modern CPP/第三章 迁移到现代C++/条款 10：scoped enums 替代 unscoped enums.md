@@ -212,8 +212,7 @@ constexpr typename std::underlying_type<E>::type
   toUType(E enumerator) noexcept
 {
     return
-      static_cast<typename
-                  std::underlying_type<E>::type>(enumerator);
+      static_cast<typename std::underlying_type<E>::type>(enumerator);
 }
 ```
 
