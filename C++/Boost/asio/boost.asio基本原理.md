@@ -275,7 +275,6 @@ int main(int argc, char* argv[]) {
 |send_buffer_size|套接字发送缓冲区大小|int|
 |send_low_watermark|规定套接字数据发送的最小字节数|int|
 |ip::v6_only|如果为 true，则只允许 IPv6 的连接|bool|
-|||
 
 每个名字代表了一个内部套接字typedef或者类。下面是对它们的使用：
 
@@ -311,7 +310,6 @@ sock.set_option(sbs);
 |receive_from|-|是|是|
 |write_some|是|-|-|
 |send_to|-|是|是|
-||||
 
 ### 其他方法
 
