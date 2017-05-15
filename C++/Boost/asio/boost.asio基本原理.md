@@ -1022,3 +1022,213 @@ func called, i= 3/002A6138
 func called, i= 9/002A6530
 func called, i= 4/002A6138
 ```
+
+## 异步 post() VS dispatch() VS wrap()
+
+Boost.Asio提供了三种让你把处理方法添加为异步调用的方式：
+
+* service.post(handler)：这个方法能确保其在请求 io_service 实例，然后调用指定的处理方法之后立即返回。handler 稍后会在某个调用了 service.run() 的线程中被调用。
+* service.dispatch(handler)：这个方法请求 io_service 实例去调用给定的处理方法，但是另外一点，如果当前的线程调用了 service.run()，它可以在方法中直接调用 handler。
+* service.wrap(handler)：这个方法创建了一个封装方法，当被调用时它会调用 service.dispatch(handler)，这个会让人有点困惑，接下来我会简单地解释它是什么意思。
+
+在之前的章节中你会看到关于 service.post() 的一个例子，以及运行这个例子可能得到的一种结果。我们对它做一些修改，然后看看 service.dispatch() 是怎么影响输出的结果的：
+
+```C++
+using namespace boost::asio;
+io_service service;
+
+void func(int i) {
+    std::cout << "func called, i = " << i << std::endl;
+}
+
+void run_dispatch_and_post() {
+    for ( int i = 0; i < 10; i += 2) {
+    service.dispatch(boost::bind(func, i));
+    service.post(boost::bind(func, i + 1));
+    }
+}
+
+int main(int argc, char* argv[]) {
+    service.post(run_dispatch_and_post);
+    service.run();
+
+    return 0;
+}
+```
+
+在解释发生了什么之前，我们先运行程序，观察结果：
+
+```C++
+func called, i = 0
+func called, i = 2
+func called, i = 4
+func called, i = 6
+func called, i = 8
+func called, i = 1
+func called, i = 3
+func called, i = 5
+func called, i = 7
+func called, i = 9
+```
+
+偶数先输出，然后是奇数。这是因为我用 dispatch() 输出偶数，然后用 post() 输出奇数。dispatch() 会在返回之前调用 hanlder，因为当前的线程调用了 service.run()，而 post() 每次都立即返回了。
+
+现在，让我们讲讲 service.wrap(handler)。wrap() 返回了一个仿函数，它可以用来做另外一个方法的参数：
+
+```C++
+using namespace boost::asio;
+io_service service;
+
+void dispatched_func_1() {
+    std::cout << "dispatched 1" << std::endl;
+}
+
+void dispatched_func_2() {
+    std::cout << "dispatched 2" << std::endl;
+}
+
+void test(boost::function<void()> func) {
+    std::cout << "test" << std::endl;
+    service.dispatch(dispatched_func_1);
+    func();
+}
+
+void service_run() {
+    service.run();
+}
+
+int main(int argc, char* argv[]) {
+    test(service.wrap(dispatched_func_2));
+    boost::thread th(service_run);
+    boost::this_thread::sleep( boost::posix_time::millisec(500));
+    th.join();
+
+    return 0;
+}
+```
+
+`test(service.wrap(dispatched_func_2));` 会把 dispatched\_func\_2 包装起来创建一个仿函数，然后传递给 test 当作一个参数。当 test() 被调用时，它会分发调用方法 1，然后调用 func()。这时，你会发现调用 func() 和 service.dispatch(dispatched\_func\_2) 是等价的，因为它们是连续调用的。程序的输出证明了这一点：
+
+```C++
+test
+dispatched 1
+dispatched 2
+```
+
+io\_service::strand 类（用来序列化异步调用）也包含了 poll(), dispatch() 和  wrap()等成员函数。它们的作用和 io\_service 的 poll(), dispatch() 和 wrap()是一样的。然而，大多数情况下你只需要把 io\_service::strand::wrap() 方法做为 io\_service::poll()或者io\_service::dispatch()方法的参数即可。
+
+## 保持活动
+
+假设你需要做下面的操作：
+
+```C++
+io_service service;
+ip::tcp::socket sock(service);
+char buff[512];
+...
+read(sock, buffer(buff));
+```
+
+在这个例子中，sock 和 buff 的存在时间都必须比 read() 调用的时间要长。也就是说，在调用 read() 返回之前，它们都必须有效。这就是你所期望的；你传给一个方法的所有参数在方法内部都必须有效。当我们采用异步方式时，事情会变得比较复杂。
+
+```C++
+io_service service;
+ip::tcp::socket sock(service);
+char buff[512];
+void on_read(const boost::system::error_code &, size_t) {}
+...
+async_read(sock, buffer(buff), on_read);
+```
+
+在这个例子中，sock 和 buff 的存在时间都必须比 async\_read() 操作本身时间要长，但是 async\_read 操作持续的时间我们是不知道的，因为它是异步的。
+
+当使用 socket 缓冲区的时候，你会有一个 buffer 实例在异步调用时一直存在（使用boost::shared_array<>）。在这里，我们可以使用同样的方式，通过创建一个类并在其内部管理 socket 和它的读写缓冲区。然后，对于所有的异步操作，传递一个包含智能指针的 boost::bind 仿函数给它：
+
+```C++
+using namespace boost::asio;
+io_service service;
+
+struct connection : boost::enable_shared_from_this<connection>
+{
+    typedef boost::system::error_code error_code;
+    typedef boost::shared_ptr<connection> ptr;
+
+    connection() : sock_(service), started_(true) {}
+
+    void start(ip::tcp::endpoint ep) {
+        sock_.async_connect(ep, boost::bind(&connection::on_connect, shared_from_this(), _1));
+    }
+
+    void stop() {
+        if (!started_) return;
+        started_ = false;
+        sock_.close();
+    }
+
+    bool started() { return started_; }
+
+private:
+    void on_connect(const error_code & err) {
+        // 这里你决定用这个连接做什么: 读取或者写入
+        if (!err) do_read();
+        else stop();
+    }
+
+    void on_read(const error_code& err, size_t bytes) {
+        if (!started()) return;
+        std::string msg(read_buffer_, bytes);
+        if (msg == "can_login") do_write("access_data");
+        else if (msg.find("data ") == 0) process_data(msg);
+        else if (msg == "login_fail") stop();
+    }
+
+    void on_write(const error_code& err, size_t bytes) {
+        do_read();
+    }
+
+    void do_read() {
+        sock_.async_read_some(buffer(read_buffer_), boost::bind(&connection::on_read, shared_from_this(), _1, _2));
+    }
+
+    void do_write(const std::string& msg) {
+        if (!started()) return;
+        // 注意: 因为在做另外一个async_read操作之前你想要发送多个消息,
+        // 所以你需要多个写入buffer
+        std::copy(msg.begin(), msg.end(), write_buffer_);
+        sock_.async_write_some(buffer(write_buffer_, msg.size()), boost::bind(&connection::on_write, shared_from_this(), _1, _2));
+    }
+
+    void process_data(const std::string& msg) {
+        // 处理服务端来的内容，然后启动另外一个写入操作
+    }
+
+private:
+    ip::tcp::socket sock_;
+    enum { max_msg = 1024 };
+    char read_buffer_[max_msg];
+    char write_buffer_[max_msg];
+    bool started_;
+};
+
+int main(int argc, char* argv[]) {
+    ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
+    connection::ptr(new connection)->start(ep);
+
+    return 0;
+}
+```
+
+在所有异步调用中，我们传递一个 boost::bind 仿函数当作参数。这个仿函数内部包含了一个智能指针，指向 connection 实例。只要有一个异步操作等待时，Boost.Asio 就会保存 boost::bind 仿函数的拷贝，这个拷贝保存了指向连接实例的一个智能指针，从而保证 connection 实例保持活动。问题解决！
+
+当然，connection 类仅仅是一个框架类；你需要根据你的需求对它进行调整（它看起来会和当前服务端例子的情况相当不同）。
+
+你需要注意的是创建一个新的连接是相当简单的：`connection::ptr(new connection)->start(ep)`。这个方法启动了到服务端的（异步）连接。当你需要关闭这个连接时，调用 stop()。
+
+当实例被启动时（start()），它会等待客户端的连接。当连接发生时。on_connect()被调用。如果没有错误发生，它启动一个read操作（do_read()）。当read操作结束时，你就可以解析这个消息；当然你应用的on_read()看起来会各种各样。而当你写回一个消息时，你需要把它拷贝到缓冲区，然后像我在do_write()方法中所做的一样将其发送出去，因为这个缓冲区同样需要在这个异步写操作中一直存活。最后需要注意的一点——当写回时，你需要指定写入的数量，否则，整个缓冲区都会被发送出去。
+
+
+
+
+
+
+
