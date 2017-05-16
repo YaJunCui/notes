@@ -10,6 +10,11 @@
 
 ## [C++](https://github.com/YaJunCui/notes/tree/master/C++)：C++笔记
 
+* [Boost](https://github.com/YaJunCui/notes/tree/master/C++/Boost)
+* [Effective Modern CPP](https://github.com/YaJunCui/notes/tree/master/C%2B%2B/Effective%20Modern%20CPP)
+* [muduo](https://github.com/YaJunCui/notes/tree/master/C%2B%2B/muduo)
+* [define中do{}while(0)的价值](https://github.com/YaJunCui/notes/blob/master/C++/define中do{}while(0)的价值.md)
+* [muduo编译和安装](https://github.com/YaJunCui/notes/blob/master/C++/muduo编译和安装.md)
 * [Windows+Visual Studio内存泄漏检测](https://github.com/YaJunCui/notes/blob/master/C++/Windows+Visual_Studio内存泄漏检测.md)
 
 ## [git](https://github.com/YaJunCui/notes/tree/master/git)：git笔记
@@ -32,6 +37,8 @@
 
 * [简单十步让你全面理解SQL](https://github.com/YaJunCui/notes/blob/master/mysql/简单十步让你全面理解SQL.md)
 
+## [python](https://github.com/YaJunCui/notes/tree/master/python)：python笔记
+
 ## [RTX](https://github.com/YaJunCui/notes/tree/master/RTX)：RTX笔记
 
 * [RTX激活码申请](https://github.com/YaJunCui/notes/blob/master/RTX/RTX激活码申请.md)
@@ -40,3 +47,5 @@
 
 * [关联容器](https://github.com/YaJunCui/notes/blob/master/STL/关联容器.md)
 * [哈希表hashtable](https://github.com/YaJunCui/notes/blob/master/STL/哈希表hashtable.md)
+
+## [VSCode](https://github.com/YaJunCui/notes/tree/master/VSCode)：VSCode笔记
