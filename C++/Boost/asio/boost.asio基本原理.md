@@ -1195,7 +1195,8 @@ private:
         // 注意: 因为在做另外一个async_read操作之前你想要发送多个消息,
         // 所以你需要多个写入buffer
         std::copy(msg.begin(), msg.end(), write_buffer_);
-        sock_.async_write_some(buffer(write_buffer_, msg.size()), boost::bind(&connection::on_write, shared_from_this(), _1, _2));
+        sock_.async_write_some(buffer(write_buffer_, msg.size()),
+            boost::bind(&connection::on_write, shared_from_this(), _1, _2));
     }
 
     void process_data(const std::string& msg) {
@@ -1224,9 +1225,20 @@ int main(int argc, char* argv[]) {
 
 你需要注意的是创建一个新的连接是相当简单的：`connection::ptr(new connection)->start(ep)`。这个方法启动了到服务端的（异步）连接。当你需要关闭这个连接时，调用 stop()。
 
-当实例被启动时（start()），它会等待客户端的连接。当连接发生时。on_connect()被调用。如果没有错误发生，它启动一个read操作（do_read()）。当read操作结束时，你就可以解析这个消息；当然你应用的on_read()看起来会各种各样。而当你写回一个消息时，你需要把它拷贝到缓冲区，然后像我在do_write()方法中所做的一样将其发送出去，因为这个缓冲区同样需要在这个异步写操作中一直存活。最后需要注意的一点——当写回时，你需要指定写入的数量，否则，整个缓冲区都会被发送出去。
+当实例被启动时（start()），它会等待客户端的连接。当连接发生时，on\_connect() 被调用。如果没有错误发生，它启动一个 read 操作（do\_read()）。当 read 操作结束时，你就可以解析这个消息；当然你应用的 on\_read() 看起来会各种各样。而当你写回一个消息时，你需要把它拷贝到缓冲区，然后像我在 do\_write() 方法中所做的一样将其发送出去，因为这个缓冲区同样需要在这个异步写操作中一直存活。最后需要注意的一点 —— 当写回时，你需要指定写入的数量，否则，整个缓冲区都会被发送出去。
 
+## 总结
 
+网络 api 实际上要繁杂得多，这个章节只是做为一个参考，当你在实现自己的网络应用时可以回过头来看看。
 
+Boost.Asio 实现了 **端点** 的概念，你可以认为是 **IP 和端口**。如果你不知道准确的 IP，你可以使用 resolver 对象将主机名，例如 www.yahoo.com 转换为一个或多个 IP 地址。
 
+我们也可以看到 API 的核心 —— socket 类。Boost.Asio 提供了 TCP、UDP 和 ICMP 的实现。而且你还可以用你自己的协议来对它进行扩展；当然，这个工作不适合缺乏勇气的人。
 
+异步编程是刚需。你应该已经明白为什么有时候需要用到它，尤其在写服务端的时候。调用 service.run() 来实现异步循环就已经可以让你很满足，但是有时候你需要更进一步，尝试使用 run\_one()、poll() 或者 poll\_one()。
+
+当实现异步时，你可以异步执行你自己的方法；使用 service.post() 或者 service.dispatch()。
+
+最后，为了使 socket 和缓冲区（read 或者 write）在整个异步操作的生命周期中一直活动，我们需要采取特殊的防护措施。你的连接类需要继承自 enabled\_shared\_from\_this，然后在内部保存它需要的缓冲区，而且每次异步调用都要传递一个智能指针给 this 操作。
+
+下一章会进行实战操作；在实现回显客户端/服务端应用时会有大量的编程实践。
