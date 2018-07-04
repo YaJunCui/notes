@@ -11,8 +11,8 @@ WSGI有两方：服务器方 和 应用程序。
 ```python
 
 def app(environ, start_response):   
-	start_response('200 OK', [('Content-Type', 'text/plain')])   
-	yield "Hello world!\n"
+    start_response('200 OK', [('Content-Type', 'text/plain')])   
+    yield "Hello world!\n"
 
 ```
 
