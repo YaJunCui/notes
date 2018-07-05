@@ -6,7 +6,7 @@ WSGI有两方：服务器方 和 应用程序。
 
 * 应用程序：用来生成返回的 header、body和status，以便返回给服务器方。
 
-用 python 语言写的一个符合 WSGI 的 “Hello World” 应用程序如下所示：
+用 python 语言写的一个符合 wsgi 的 “Hello World” 应用程序如下所示：
 
 ```python
 
@@ -57,3 +57,16 @@ def main():
     ShireApplication("%prog [OPTIONS] APP_MODULE").run()
 
 ```
+
+如上，我们要做的就是继承自 Application 来实现自己的 application，在这个自己的 app 中来加载处理函数(用 import_app 函数来加载)，而后调用 app.run() 来启动 gunicorn。
+
+* 如何加载处理请求处理的入口函数？ 
+	1. 用函数 import_app() 来加载；
+	2. 该函数的参数是一个 python 模块或脚本。系统会去这个指定的脚本中查找一个名字叫做 application 的函数对象！所以我们只要实现一个名字叫 application 的函数就可以了！（名字不能错）
+
+* 这个请求处理入口函数的样式：
+	这个请求处理入口函数是固定的，按照 wsgi 协议，其要支持2个参数 environ 和 start\_response。
+
+     
+那这里还有个问题：传递给入口函数的 environ 里边有什么信息呢？是不是有固定的样式？environ 是一个 dict，里边含有各种环境信息。但是这些环境信息有没有固定的 key 名字呢？这个协议中没有规定，只是有一些约束而已。
+具体如何，我们最好还是看一下具体实现，比如 gunicorn 中或者 werkzeug 中的实现。
